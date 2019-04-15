@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene>
+        <!-- 资源管理 -->
+        <a-assets>
+            <!-- 图片 -->
+            <img id="boxTexture" src="https://i.imgur.com/mYmmbrp.jpg" alt="">
+            <img id="sphereTexture" src="img/1.jpg" alt="">
+            <img id="skyTexture" src="img/room.jpg" alt="">
+            <!-- <img id="skyTexture" src="img/environment1.jpg" alt=""> -->
+            <!-- <img id="groundTexture" src="img/floor.jpg" alt=""> -->
+            <!-- 音频两种方式 -->
+            <!-- <audio src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav" autoplay preload></audio> -->
+            <!-- <a-sound src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav" autoplay="true" position="-3 1 -4" ></a-sound> -->
+            
+        </a-assets>
+        <!-- 实体 -->
+        <a-box src="#boxTexture" position="0 2 -5" rotation="0 45 45" scale-on-click="to:3 3 3" >
+            <a-animation attribute="position" to="0 2.2 -5" direction="alternate" dur="2000" repeat="indefinite" ></a-animation>
+            <!-- 通过begin接受事件名称，启动动画 -->
+            <a-animation attribute="scale" begin="mouseenter" dur="300" to="2.3 2.3 2.3" ></a-animation>
+            <a-animation attribute="scale" begin="mouseleave" dur="300" to="2 2 2" ></a-animation>
+            <a-animation attribute="rotation" begin="click" dur="2000" to="360 360 360" ></a-animation>
+        </a-box>
+        <a-sphere src="#sphereTexture" position="3 2 -5" >
+            <a-animation attribute="rotation" to="0 360 0" direction="" dur="3000" repeat="indefinite" ></a-animation>
+        </a-sphere>
+        <!-- 文字 -->
+        <a-text value="hello!!!" color="#bbb" position="-0.9 0.2 -3" scale="1.5 1.5 1.5" ></a-text>
+        <a-sky src="#skyTexture"></a-sky>
+        <!-- <a-plane src="#groundTexture" rotation="-90 0 0" width="30" height="30" repeat="10 10" ></a-plane> -->
+        <!-- 光源 -->
+        <a-light type="ambient" color="#445451" ></a-light>
+        <a-light type="point" intensity="2" position="2 4 4" ></a-light>
+        <!-- 交互 -->
+        <a-camera>
+            <a-cursor></a-cursor>
+        </a-camera>
+    </a-scene>
+
+    <script>
+        // 动画交互
+        //1、 js方法
+        // var boxEl=document.querySelector('a-box');
+        // boxEl.addEventListener("click",function(){
+        //     boxEl.setAttribute('scale',{x:2,y:2,z:2});
+        // })
+
+        // 2、封装组件，然后元素调用
+        AFRAME.registerComponent('scale-on-click',{
+            schema:{
+                to:{default:'2.5,2.5,2.5' }
+            },
+            init:function(){
+                var data=this.data;
+                this.el.addEventListener('click',function(){
+                    this.setAttribute('scale',data.to);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

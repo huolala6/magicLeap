@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>视频播放</title>
+		<link rel="stylesheet" type="text/css" href="video-js.6.0.css" />
+		<script src="video.6.0.js" type="text/javascript" charset="utf-8"></script>
+		<style>
+			.container {
+				padding: 20px;
+			}
+			
+			h3 {
+				line-height: 2em;
+			}
+			
+			.box {
+				margin-bottom: 20px;
+			}
+			
+			.actions a {
+				display: inline-block;
+				color: #3F65EE;
+				border: 1px solid #3F65EE;
+				line-height: 1.5em;
+				padding: 0 1em;
+				text-decoration: none;
+				margin: 5px;
+				border-radius: 3px;
+			}
+			
+			.actions a.active {
+				color: #fff;
+				background-color: #3F65EE;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<h3>通过dom初始化</h3>
+			<hr />
+			<div class="box">
+				<video id="video1" class="video-js" controls preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png" data-setup='{"example_option":true}' width="640" height="264">
+					<source id="sourceBox" src="http://static.qiakr.com/movie/0060202.mp4" type="video/mp4"></source>
+					当前浏览器不支持 video直接播放，点击这里下载视频：
+					<a href="myvideo.webm">下载视频</a>
+				</video>
+
+			</div>
+
+			<h3>通过js初始化</h3>
+			<hr />
+			<div class="box">
+				<video id="video2" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png" data-setup='{"example_option":true}' width="640" height="264">
+					<source id="sourceBox" src="http://static.qiakr.com/movie/0060202.mp4" type="video/mp4"></source>
+					当前浏览器不支持 video直接播放，点击这里下载视频：
+					<a href="myvideo.webm">下载视频</a>
+				</video>
+				<div class="actions">
+					<a href="javascript:;" id="btn1">播放</a>
+					<a href="javascript:;" id="btn2">暂停</a>
+					<a href="javascript:;" id="btn3">隐藏音量调节控件</a>
+					<a href="javascript:;" id="btn4">设置宽高</a>
+					<a href="javascript:;" id="btn5">隐藏</a>
+					<a href="javascript:;" id="btn6">显示</a>
+					<a href="javascript:;" id="btn7">设置其他资源</a>
+					<a href="javascript:;" id="btn8">销毁</a>
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+	var oV2=videojs('#video2');
+	document.querySelector('.actions').addEventListener('click',function(e){
+		if(e.srcElement.tagName.toLowerCase()!=='a' || e.target.classList.contains('active'))
+			return;
+		var i=e.target.id,btn=e.target;
+		var o=document.querySelector('.actions .active');
+		o&&o.classList.remove('active');
+		btn.classList.add('active');
+		switch(i){
+			case 'btn1':
+				oV2.play();
+				break;
+			case 'btn2':
+				oV2.pause();
+				break;
+			case 'btn3':
+				oV2.controlBar.volumeMenuButton.hide();
+				break;
+			case 'btn4':
+				oV2.width(300).height(200);
+				break;
+			case 'btn5':
+				oV2.hide();
+				break;
+			case 'btn6':
+				oV2.show();
+				break;
+			case 'btn76':
+				oV2.src="http://static.qiakr.com/movie/0080108.mp4";
+				oV2.load();
+				oV2.play();
+				break;
+			default:
+				oV2.dispose();
+				break;
+		}
+	},false);
+</script>
+	</body>
+
+</html>

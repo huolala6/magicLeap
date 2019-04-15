@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			console.log(this === window);
+			
+			//
+//			a : for(var i =0;i<5;i++){
+//    for(var j =0; j<1; j++){
+//          if(i ==3){
+//              break  a;
+//          }
+//              alert(i);
+//
+//    }
+//}
+			//
+function S4() {
+   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+}
+function guid() {
+   return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+var myID = "static" + guid();
+console.log(myID);
+		</script>
+	</body>
+</html>

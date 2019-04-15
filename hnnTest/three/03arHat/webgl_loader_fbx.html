@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>three.js webgl - FBX loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+				<!-- 新 Bootstrap4 核心 CSS 文件 -->
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="static/css/index.css" />
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader<br /> Character and animation from
+			<a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a>
+		</div>
+		<div class="row">
+
+			<div class="control col-md-2">
+				<div id="control-btn" class="control-btn">
+					<ul>
+						<li class="active">场景</li>
+						<li>灯光</li>
+						<li>材料</li>
+						<li>标记</li>
+					</ul>
+				</div>
+				<div class="control-panel">
+					<div class="control-panel-set">
+						<div class="panel-item">
+							<div class="panel-header" data-toggle="collapse" data-target="#control-position">
+								位置旋转
+							</div>
+							<div id="control-position" class="panel-body collapse show">
+								<button id="rotation-x" type="button">x</button>
+								<button id="rotation-y" type="button">y</button>
+								<button id="rotation-z" type="button">z</button>
+							</div>
+						</div>
+						<div class="panel-item">
+							<div class="panel-header" data-toggle="collapse" data-target="#control-camera">
+								相机
+							</div>
+							<div id="control-camera" class="panel-body collapse show">
+								<div class="progress">
+									<div id="camera-bar" class="progress-bar" style="width: 45%;"></div>
+								</div>
+								<input type="text" id="camera-bar-value" value="45" />
+							</div>
+						</div>
+					</div>
+					<div class="control-panel-set">
+						<!-- 按钮：用于打开模态框 -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  选择音乐文件
+</button>
+ 
+<!-- 模态框 -->
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+ 
+      <!-- 模态框头部 -->
+      <div class="modal-header">
+        <h4 class="modal-title">选择文件</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+ 
+      <!-- 模态框主体 -->
+      <div class="modal-body">
+        模态框内容..
+      </div>
+ 
+      <!-- 模态框底部 -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+						
+					</div>
+					<div class="control-panel-set">
+						材料
+					</div>
+					<div class="control-panel-set">
+						标记
+					</div>
+				</div>
+			</div>
+			
+						<div class="col-md-10">
+				<div class="contain" id="container">
+
+				</div>
+			</div>
+		</div>
+
+
+		<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+		<script src="static/js/jquery-1.12.4.min.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- popper.min.js 用于弹窗、提示、下拉菜单 -->
+		<script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+
+		<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+		<script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+		<script src="static/js/three.min.js"></script>
+
+		<script src="static/js/inflate.min.js"></script>
+		<script src="static/js/FBXLoader.js"></script>
+
+		<script src="static/js/OrbitControls.js"></script>
+		<script src="static/js/TransformControls.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="static/js/Detector.js"></script>
+		<script src="static/js/stats.min.js"></script>
+		<script src="static/js/index.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$("#control-btn li").click(function() {
+				var index = $(this).index();
+				$(this).addClass("active").siblings().removeClass("active");
+				$(".control-panel-set").eq(index).show().siblings().hide();
+			})
+		</script>
+
+
+	</body>
+
+</html>

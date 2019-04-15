@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/aframe.min.js"></script>
+    <style>
+    body{
+        margin: 0
+    }
+    </style>
+</head>
+<body>
+    <script>
+        AFRAME.registerComponent('hide-on-click',{
+            schema:{
+                target:{type:'selector'}
+            },
+            init:function(){
+                var data=this.data;
+                var el=this.el;
+                el.addEventListener('click',function(){
+                    el.setAttribute('visible',false);
+                    data.target.setAttribute('visible',true);
+                })
+            }
+        })
+    </script>
+
+    <a-scene>
+        <!-- 资源管理 -->
+        <a-aseets>
+            <img id="skyTexture" src="img/environment1.jpg" alt="">
+        </a-aseets>
+
+        <!-- 实体 -->
+        <a-sky src="#skyTexture" ></a-sky>
+        <a-sphere hide-on-click="target:#another_cube" position="0 2 -6" radius="1" color="#4cc3d9" >
+            <a-animation attribute="scale" from="1 1 1" to="1.5 1.5 1.5" dur="2000" repeat="indefinite" direction="alternate" ></a-animation>
+        </a-sphere>
+        <a-cylinder id="another_cube" visible="false" position="-2 0 -4" radius="0.5" height="1.5" color="#ffc65d" >
+            <a-animation attribute="height" from="1.5" to="0" repeat="indefinite" direction="alternate" ></a-animation>
+        </a-cylinder>
+        <!-- <a-light type="point" intensity="2" position="2 4 4"></a-light> -->
+
+        <!-- 交互 -->
+        <a-entity camera look-controls>
+            <a-cursor></a-cursor>
+        </a-entity>
+    </a-scene>
+</body>
+</html>

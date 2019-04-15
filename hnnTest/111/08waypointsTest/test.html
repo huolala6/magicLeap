@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="jquery.waypoints.js" type="text/javascript" charset="utf-8"></script>
+		
+	</head>
+	<style>
+		body{
+			height: 2000px;
+		}
+		div{
+			width: 500px;
+			height: 100px;
+			margin-top: 500px;
+			background: #008000;
+			text-align: center;
+			font-size: 50px
+		}
+		.in{
+			background: #FFFF00;
+			transition: all 1s;
+		}
+	</style>
+	<body>
+		<div id="div1">div1</div>
+		<div id="div2">div2</div>
+		<div id="div3">div3</div>
+	</body>
+	<script>
+		$(function(){
+			$("#div1").waypoint(function(){
+				console.log("top");
+			});
+			$("#div2").waypoint(function(direction){
+				if(direction == "down"){
+					$("#div2").addClass("in");
+					console.log("向下");
+				}
+				else{
+					$("#div2").removeClass("in");
+					console.log("向上");
+				}
+			},
+			{
+				offset:"100%"
+			})
+		})
+//		var wp=new Waypoint({
+//			element:document.getElementById("div1"),
+//			handler:function(){
+//				notify("div1")
+//			}
+//		})
+	</script>
+</html>

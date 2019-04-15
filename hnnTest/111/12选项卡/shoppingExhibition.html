@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS特效-风景相册</title>
+    <link rel="stylesheet" href="../reset.css">
+    <style>
+        /*#box{
+            border: 1px solid #ccc;
+            width: 430px;
+            padding-top: 430px;
+            background: url("img/shop_01.jpg") no-repeat;
+            margin: 100px auto;
+        }*/
+
+       .big img{
+       	width: 430px;
+       	height: auto;
+       	display: none;
+       }
+       .big img:first-of-type{
+       	display: block;
+       }
+       
+        ul{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #ddd;
+
+        }
+        li{
+            list-style: none;
+            float: left;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+	<div class="big">
+		<img src="img/shop_01.jpg" alt="">
+        <img src="img/shop_02.jpg" alt="">
+        <img src="img/shop_03.jpg" alt="">
+        <img src="img/shop_04.jpg" alt="">
+        <img src="img/shop_05.jpg" alt="">
+	</div>
+<div id="box">
+    <ul>
+        <li><img src="img/shop_01.jpg" width="86px" alt=""></li>
+        <li><img src="img/shop_02.jpg" width="86px" alt=""></li>
+        <li><img src="img/shop_03.jpg" width="86px" alt=""></li>
+        <li><img src="img/shop_04.jpg" width="86px" alt=""></li>
+        <li><img src="img/shop_05.jpg" width="86px" alt=""></li>
+    </ul>
+</div>
+
+<script src="jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+// 答题区。。。。。
+
+$('li').mouseenter(function(){
+	var index = $(this).index();
+	$(".big img").eq(index).show().siblings().hide();
+})
+</script>
+</body>
+</html>

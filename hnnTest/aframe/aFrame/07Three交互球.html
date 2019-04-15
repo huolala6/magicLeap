@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <style>
+        body{
+            background: #333;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <script>
+        var renderer,scene,camera,orbit,lights,mesh;
+        init();
+        animate();
+        function init() {
+            lights =new Array();
+            renderer=new THREE.WebGLRenderer({
+                alpha:true,
+                antialias:true
+            });
+            renderer.setSize(window.innerWidth,window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            scene=new THREE.Scene();
+            camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,100);
+            camera.position.set(0,0,10);
+            scene.add(camera);
+
+            orbit=new THREE.OrbitControls(camera,renderer.domElement);
+            orbit.enableZoom=false;
+
+            lights[0]=new THREE.PointLight(0xffffff,1,0);
+            lights[1]=new THREE.PointLight(0xffffff,1,0);
+            lights[2]=new THREE.PointLight(0xffffff,1,0);
+            lights[0].position.set(0,200,0); 
+            lights[1].position.set(100,200,100); 
+            lights[2].position.set(-100,-200,-100); 
+            scene.add(lights[0]);
+            scene.add(lights[1]);
+            scene.add(lights[2]);
+
+            mesh=new THREE.Object3D();
+            mesh.add(new THREE.LineSegments(
+                new THREE.Geometry(),
+                new THREE.LineBasicMaterial({
+                    color:0xffffff,
+                    transparent:true,
+                    opacity:1
+                })
+            ));
+            mesh.add(new THREE.Mesh(
+                new THREE.SphereGeometry(3,24,24),
+                new THREE.MeshPhongMaterial({
+                    color:0x156289,
+                    emissive:0x072534,
+                    side:THREE.DoubleSide,
+                    shading:THREE.FlatShading
+                })
+            ));
+            scene.add(mesh);
+            renderer.render(scene,camera);
+        }    
+        function animate(){
+            requestAnimationFrame(animate);
+            mesh.rotation.x+=0.003;
+            mesh.rotation.y+=0.003;
+            renderer.render(scene,camera);
+        }
+    </script>
+</body>
+</html>

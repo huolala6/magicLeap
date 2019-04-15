@@ -1,0 +1,30 @@
+/*声明 WebFont*/
+@font-face {
+  font-family: 'zizhu';
+  src: url('../font/zizhu.eot');
+  src:
+    url('../font/zizhu.eot?#font-spider') format('embedded-opentype'),
+    url('../font/zizhu.woff2') format('woff2'),
+    url('../font/zizhu.woff') format('woff'),
+    url('../font/zizhu.ttf') format('truetype'),
+    url('../font/zizhu.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/*使用指定字体*/
+.home h1, .demo > .test {
+    font-family: 'source';
+}
+h1{
+	font-size: 36px;
+	color: #FF0000;
+	font-family: "zizhu";
+	
+}
+h2{
+	font-size: 36px;
+	color: #FF00FF;
+	/*font-family: "隶书";*/
+	
+}

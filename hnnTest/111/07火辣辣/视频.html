@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+				/*.sec1 .video-js .vjs-tech {
+    width: auto;
+    height: 100%;
+}*/
+/*.sec1 .video-js .vjs-tech {
+         top: 0;
+    width: 100%;
+    height: auto;
+    left: 0;
+    min-width: 100%;
+}*/
+		</style>
+	</head>
+	<body>
+		<script>
+			window.onresize = function() {
+					//判断屏幕的和视频比例的大小
+					var win = window.innerHeight / window.innerWidth;
+					if(win <= 0.5625) {
+						//							console.log("1===="+win);
+						$(".sec1 .video-js .vjs-tech").css({
+							"width": "100%",
+							"height": "auto",
+							"min-width": "100%"
+						})
+
+					} else {
+						//							console.log("2===="+win);
+						$(".sec1 .video-js .vjs-tech").css({
+							"width": "auto",
+							"height": "100%",
+							"min-width": "100%"
+						})
+					}
+				}
+		</script>
+	</body>
+</html>
