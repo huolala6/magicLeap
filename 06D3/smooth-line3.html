@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kernel Smoother</title>
+    <meta charset="utf-8">
+    <style>
+      .c_line1 {
+      	fill: none;
+      	stroke: steelblue;
+      	stroke-width: 2px;
+        opacity: 0.4;
+      }
+      /*x-axis styles*/
+      .c_x_axis text {
+      	font: 10px sans-serif;
+      }
+      
+      .c_x_axis path,
+      .c_x_axis line {
+      	fill: none;
+      	stroke: #000;
+      	shape-rendering: crispEdges;
+      }
+      
+      /*y-axis styles*/
+      .c_y_axis text {
+      	font: 10px sans-serif;
+      }
+      
+      .c_y_axis path,
+      .c_y_axis line {
+      	fill: none;
+      	stroke: #000;
+      	shape-rendering: crispEdges;
+      }
+      /*y-axis gridline styles*/
+      .c_y_grid{
+      	fill: none;
+      	stroke: grey;
+      	stroke-dasharray: 3 3;
+      	stroke-width: 1px;
+        opacity: 0.7;
+      }
+      /*Smoothed line styles*/
+      .c_sline1 {
+      	fill: none;
+      	stroke: darkblue;
+      	stroke-width: 3px;
+        opacity: 0.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form onchange="updateChart(scale.value, kernel.value, diff.value)">
+        <label>Scale of kernel (hrs):<input type="number" min="0.1" max="24" value="0.5" step="0.1" id="scale" /></label>
+        <label>Kernel Type :<select name="kernel">
+          <option value="Gaussian">Gaussian</option>
+          <option value="Epanechnikov">Epanechnikov</option>
+          <option value="Logistic">Logistic</option>
+          <option value="Uniform">Uniform</option>
+          <option value="Triangle">Triangle</option>
+          <option value="Quartic">Quartic</option>
+          <option value="Triweight">Triweight</option>
+          <option value="Cosine">Cosine</option>
+          <option value="Tricube">Tricube</option>
+          <option value="Silverman">Silverman</option>
+        </select></label>
+        <label>Calculation ratio :<input type="number" min="0" max="1" value="0.001" step="0.001" id="diff" /></label>
+      </form>
+    </div>
+    
+    <div id="example"></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="src/kernels.js"></script>
+    <script src="src/smoothKernel2.js"></script>
+    <script>
+    
+      var cht;
+      var sm_temp1;
+      var slines;
+    
+  	  d3.csv("src/data.csv", function(data) {
+  		var temp1 = data.map(function(e){
+  			let time = e.time.split(',')[1]
+		let count = e.count.split(',')[0]
+		console.log("e.time",time)
+//		d.time = parseTime(time);
+//		d.count = +count;
+		
+  			var temp = [];
+  			temp.push(count);
+  			temp.push(time);
+  			return temp;
+  		});
+  		temp1 = temp1.map(function(d){
+  			var temp_time = d[1].split(":");
+  			return [new Date(2016, 1, 30, +temp_time[0], +temp_time[1], 0), +d[0]]; 
+  		});
+  		sm_temp1 = ssci.smooth.kernel2()
+  		                      .kernel("Gaussian")
+  		                      .data(temp1)
+  		                      .scale(1800000);
+  		sm_temp1();
+  		
+  		//Define charting variables
+  		var chart_width = 960;
+  		var chart_height = 500;
+  		var margin_top = 30;
+  		var margin_bottom = 30;
+  		var margin_left = 80;
+  		var margin_right = 30;
+		  var tf = d3.time.format("%H:%M");
+  
+  		//Create SVG object
+  		cht = d3.select("#example")
+  				.append("svg")
+  				.attr("class", "c_chart")
+  				.attr("width", chart_width)
+  				.attr("height", chart_height);
+  						
+  		//Scales
+  		var x_scale = d3.time.scale()
+  				.domain(d3.extent(temp1, function(d){ return d[0]}))
+  				.range([margin_left, chart_width-margin_right]);
+  		var y_scale = d3.scale.linear()
+  				.domain([0, 700])
+  				.range([chart_height-margin_bottom, margin_top]);
+  
+  		//X Axis
+  		var xAxis = d3.svg.axis()
+  				  .scale(x_scale)
+  				  .orient("bottom")
+  				  .tickFormat(tf);
+  
+  		cht.append("g")
+  		   .attr("class", "c_x_axis")
+  		   .attr("transform", "translate(0,"+ (chart_height-margin_bottom) +")")
+  		   .call(xAxis);
+  
+  		//Y Axis
+  		var yAxis = d3.svg.axis()
+  				  .scale(y_scale)
+  				  .orient("left");
+  
+  		cht.append("g")
+  		   .attr("class", "c_y_axis")
+  		   .attr("transform", "translate(" + margin_left + ",0)")
+  		   .call(yAxis);
+  
+  		//Lines
+  		var lines = d3.svg.line()
+			          .x(function(d) { return x_scale(d[0]); })
+			          .y(function(d) { return y_scale(d[1]); })
+						
+			cht.append("path")
+				    .data(temp1)
+				    .attr("d", lines(temp1))
+				    .attr("class","c_line1");
+  		
+  		//Add smoothed line
+  		slines = d3.svg.line()
+  			         .x(function(d) { return x_scale(d[0]); })
+  			         .y(function(d) { return y_scale(d[1]); });
+  						
+			cht.append("path")
+    				.data(sm_temp1.output())
+    				.attr("d", slines(sm_temp1.output()))
+    				.attr("class","c_sline1");
+    });
+    
+    function updateChart(scale, kernel, diff){
+    	//Convert scale to number and milliseconds (from hours)
+    	var scl = +scale*1000*60*60;
+    	
+    	var dff = +diff;
+    	
+        sm_temp1.scale(scl).kernel(kernel).diff(dff);
+        sm_temp1();
+    		
+    	cht.selectAll(".c_sline1")
+    		.transition()
+    		.duration(750)
+    		.attr("d", slines(sm_temp1.output()));
+    	
+    }
+    </script>
+  </body>
+</html>

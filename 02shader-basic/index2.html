@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#container {
+				width: 100vw;
+				height: 100vh;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		
+		<script src="three.js" type="text/javascript" charset="utf-8"></script>
+		<script id="vertexShader" type="x-shader/x-vertex">
+			void main() {
+				//gl_Position = vec4( position, 1.0 );
+				 gl_Position = projectionMatrix * modelViewMatrix*vec4( position, 1.0 ); 
+				 }
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			//颜色随时间渐变
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
+uniform float iTime;
+uniform vec2 iResolution;
+float t=iTime;
+vec2 re=iResolution;
+void main()
+{
+    vec2 uv = gl_FragCoord.xy / re.xy;// 将坐标转换到0-1之间
+    gl_FragColor = vec4(uv,0.5+0.5*sin(t),1.0);// r，g位置绝对，b随时间变化。
+}
+		</script>
+<!--<script id="fragmentShader" type="x-shader/x-fragment">
+//#ifdef GL_ES
+//precision mediump float;
+//#endif
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+uniform float iTime;
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
+vec2 random2(vec2 st){
+    st = vec2( dot(st,vec2(127.1,311.7)),dot(st,vec2(269.5,183.3)) );
+    return -1.0 + 2.0*fract(sin(st)*43758.5453123);
+}
+float noise(vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+    vec2 u = f*f*(3.0-2.0*f);
+    return mix( mix( dot( random2(i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ),
+                     dot( random2(i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
+                mix( dot( random2(i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ),
+                     dot( random2(i + vec2(1.0,1.0) ), f - vec2(1.0,1.0) ), u.x), u.y);
+}
+mat2 rotate2d(float _angle){
+    return mat2(cos(_angle),-sin(_angle),sin(_angle),cos(_angle));
+}
+float shape(vec2 st, float radius) {
+	st = vec2(0.5)-st;
+    float r = length(st)*2.00;
+    float a = atan(st.y,st.x);
+    float m = abs(mod(a+iTime*2.,3.14*2.)-3.14)/3.6;
+    float f = radius;
+    m += noise(st+iTime*-0.004)*0.124;
+    // a *= 1.+abs(atan(iTime*0.2))*.1;
+    // a *= 1.+noise(st+iTime*0.1)*0.1;
+    f += sin(a*20.000)*noise(st+iTime*3.1415)*.0103;//边缘小波稳定性
+    f += (sin(a*11.)*.1*pow(m,5.));//边缘大波稳定性 炸毛程度
+    return 1.-smoothstep(f,f+0.21,r);//边缘羽化
+}
+float shapeBorder(vec2 st, float radius, float width) {
+    return shape(st,radius)-shape(st,radius-width);
+}
+void main() {
+	
+	vec2 st = gl_FragCoord.xy/iResolution.xy;
+	
+	vec4 texel1=texture2D(iChannel0,st);
+	vec4 texel2=texture2D(iChannel1,st);
+	
+	vec3 color = vec3(1.0,1.0,1.0) * shapeBorder(st,0.8,1.);
+	vec4 t = vec4( texel1.r*color.r + texel2.r*(1.0-color.r), texel1.g*color.r + texel2.g*(1.0-color.r) ,texel1.b*color.r + texel2.b*(1.0-color.r), 1.0 );
+	vec4 t1 = vec4( texel1.r*color.r + texel2.r*(1.0-color.r), texel1.g*color.r + texel2.g*(1.0-color.r) ,texel1.b*color.r + texel2.b*(1.0-color.r), 1.0 );
+	if(st.x < 0.5){
+     	gl_FragColor = t;
+     }
+     else{
+     	gl_FragColor = t1;
+     }
+}
+</script>-->
+		<script type="text/javascript">
+			var container;
+			var camera, scene, renderer;
+			var plane, uniforms;
+			var clock=new THREE.Clock();
+			init();
+			animate();
+
+			function init() {
+				container = document.getElementById("container")
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+				camera.position.z = 10;
+				renderer = new THREE.WebGLRenderer({});
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+				//设置uniforms
+				var imouse=new THREE.Vector2();
+				window.addEventListener('touchmove',function(e){
+					imouse.x=e['touches'][0].clientX;
+					imouse.y=e['touches'][0].clientY;
+				})
+				uniforms = {
+					resolution: {
+						value: new THREE.Vector2(window.innerWidth, window.innerHeight)
+					},
+					iTime: {
+						type: "f",
+						value: 1.0
+					},
+					//当前屏幕的分辨率
+					iResolution: {
+						type: "v2",
+						value: new THREE.Vector2()
+					},
+					iMouse: {
+						type: "v2",
+						value: new THREE.Vector2()
+					},
+					iChannel0:  { type: 't', value: new THREE.TextureLoader().load('0.png') },
+        			iChannel1:  { type: 't', value: new THREE.TextureLoader().load('1.png') },
+				};
+
+					plane = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight),
+						new THREE.ShaderMaterial({
+							uniforms: uniforms,
+							vertexShader: document.getElementById('vertexShader').textContent,
+							fragmentShader: document.getElementById('fragmentShader').textContent
+						})
+					);
+					scene.add(plane);
+
+					onWindowResize();
+					window.addEventListener('resize', onWindowResize, false);
+				}
+
+				function animate() {
+					requestAnimationFrame(animate);
+					render();
+				}
+
+				function render() {
+//					uniforms.iTime.value += 0.05;
+					uniforms.iTime.value += clock.getDelta();
+					uniforms.iChannel0.value.wrapS = uniforms.iChannel0.value.wrapT = THREE.RepeatWrapping;
+uniforms.iChannel1.value.wrapS = uniforms.iChannel1.value.wrapT = THREE.RepeatWrapping;
+					renderer.render(scene, camera);
+				}
+
+				function onWindowResize(event) {
+					renderer.setSize(window.innerWidth, window.innerHeight);
+					uniforms.iResolution.value.x = renderer.domElement.width;
+					uniforms.iResolution.value.y = renderer.domElement.height;
+				}
+		</script>
+	</body>
+
+</html>

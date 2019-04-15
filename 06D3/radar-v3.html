@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+  <script type="text/javascript" src="//d3js.org/d3.v3.js"></script>
+  <script type="text/javascript" src="src/radar-chart.js"></script>
+<link rel="stylesheet" href="src/radar-chart.css">
+<head>
+  <style>
+    body {
+      padding: 20px;
+    }
+    .radar-chart .area {
+      fill-opacity: 0.7;
+    }
+    .radar-chart.focus .area {
+      fill-opacity: 0.3;
+    }
+    .radar-chart.focus .area.focused {
+      fill-opacity: 0.9;
+    }
+    .area.germany, .germany .circle {
+      fill: #FFD700;
+      stroke: none;
+    }
+    .area.argentina, .argentina .circle {
+      fill: #ADD8E6;
+      stroke: none;
+    }
+  </style>
+
+
+
+  <script type="text/javascript">
+ 
+  </script>
+</head>
+<body>
+  <div class="chart-container"></div>
+  <script type="text/javascript">
+  	   var data = [
+      {
+        className: 'germany', // optional can be used for styling
+        axes: [
+          {axis: "strength", value: 13}, 
+          {axis: "intelligence", value: 6}, 
+          {axis: "charisma", value: 5},  
+          {axis: "dexterity", value: 9},  
+          {axis: "luck", value: 2}
+        ]
+      },
+      {
+        className: 'argentina',
+        axes: [
+          {axis: "strength", value: 6}, 
+          {axis: "intelligence", value: 7}, 
+          {axis: "charisma", value: 10},  
+          {axis: "dexterity", value: 13},  
+          {axis: "luck", value: 9}
+        ]
+      }
+    ];
+    function randomDataset() {
+      return data.map(function(d) {
+        return {
+          className: d.className,
+          axes: d.axes.map(function(axis) {
+            return {axis: axis.axis, value: Math.ceil(Math.random() * 10)};
+          })
+        };
+      });
+    }
+    RadarChart.defaultConfig.levelTick = true;
+    RadarChart.draw(".chart-container", data);
+  </script>
+
+</body>
+</html>

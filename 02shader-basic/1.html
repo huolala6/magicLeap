@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#container {
+				width: 100vw;
+				height: 100vh;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		
+		<script src="three.js" type="text/javascript" charset="utf-8"></script>
+		<script id="vertexShader" type="x-shader/x-vertex">
+			
+			varying vec3 v_WorldPosition;
+			varying vec2 vUv;
+			void main() {
+				vUv=uv;
+				vec4 worldPosition=modelMatrix*vec4( position, 1.0 );//世界矩阵
+				v_WorldPosition=worldPosition.xyz;
+				
+				//gl_Position = vec4( position, 1.0 );
+				 gl_Position = projectionMatrix * modelViewMatrix*vec4( position, 1.0 ); 
+				 }
+		</script>
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+varying vec3 v_WorldPosition;
+
+uniform vec4 color;
+uniform float gridSize;
+uniform float gridSize2;
+uniform vec4 gridColor;
+uniform vec4 gridColor2;
+
+uniform bool showGrid;
+void main()
+{
+    gl_FragColor = color;
+
+    if (showGrid) {
+        float wx = v_WorldPosition.x;
+        float wz = v_WorldPosition.z;
+        float x0 = abs(fract(wx / gridSize - 0.5) - 0.5) / fwidth(wx) * gridSize / 2.0;
+        float z0 = abs(fract(wz / gridSize - 0.5) - 0.5) / fwidth(wz) * gridSize / 2.0;
+
+        float x1 = abs(fract(wx / gridSize2 - 0.5) - 0.5) / fwidth(wx) * gridSize2;
+        float z1 = abs(fract(wz / gridSize2 - 0.5) - 0.5) / fwidth(wz) * gridSize2;
+
+        float v0 = 1.0 - clamp(min(x0, z0), 0.0, 1.0);
+        float v1 = 1.0 - clamp(min(x1, z1), 0.0, 1.0);
+        if (v0 > 0.1) {
+            gl_FragColor = mix(gl_FragColor, gridColor, v0);
+        }
+        else {
+            gl_FragColor = mix(gl_FragColor, gridColor2, v1);
+        }
+    }
+
+}
+		</script>
+
+		<script type="text/javascript">
+			var container;
+			var camera, scene, renderer;
+			var plane, uniforms;
+			var clock=new THREE.Clock();
+			init();
+			animate();
+
+			function init() {
+				container = document.getElementById("container")
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+				camera.position.z = 10;
+				renderer = new THREE.WebGLRenderer({});
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+				//设置uniforms
+				var imouse=new THREE.Vector2();
+				window.addEventListener('touchmove',function(e){
+					imouse.x=e['touches'][0].clientX;
+					imouse.y=e['touches'][0].clientY;
+				})
+				uniforms = {
+					resolution: {
+						value: new THREE.Vector2(window.innerWidth, window.innerHeight)
+					},
+					iTime: {
+						type: "f",
+						value: 1.0
+					},
+					//当前屏幕的分辨率
+					iResolution: {
+						type: "v2",
+						value: new THREE.Vector2()
+					},
+					iMouse: {
+						type: "v2",
+						value: new THREE.Vector2()
+					},
+					color:{
+						type:"v4",
+						value:[1.0, 1.0, 1.0, 1.0]
+					},
+					gridSize:{
+						type:"f",
+						value:5.0
+					},
+					gridSize2:{
+						type:"f",
+						value:1.0
+					},
+					gridColor:{
+						type:"v4",
+						value:[0, 0, 0, 1]
+					},
+					gridColor2:{
+						type:"v4",
+						value:[0.3, 0.3, 0.3, 1]
+					},
+					showGrid:{
+						type:"b",
+						value:true
+					},
+					glossiness:{
+						type:"f",
+						value:0.7
+					},
+					ssaoMap:  { type: 't', value: new THREE.TextureLoader().load('0.jpg') },
+        			iChannel1:  { type: 't', value: new THREE.TextureLoader().load('earth.jpg') },
+				};
+
+					plane = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight),
+						new THREE.ShaderMaterial({
+							uniforms: uniforms,
+							vertexShader: document.getElementById('vertexShader').textContent,
+							fragmentShader: document.getElementById('fragmentShader').textContent
+						})
+					);
+					scene.add(plane);
+
+					onWindowResize();
+					window.addEventListener('resize', onWindowResize, false);
+				}
+
+				function animate() {
+					requestAnimationFrame(animate);
+					render();
+				}
+
+				function render() {
+//					uniforms.iTime.value += 0.05;
+					uniforms.iTime.value += clock.getDelta();
+					uniforms.ssaoMap.value.wrapS = uniforms.ssaoMap.value.wrapT = THREE.RepeatWrapping;
+                    uniforms.iChannel1.value.wrapS = uniforms.iChannel1.value.wrapT = THREE.RepeatWrapping;
+					renderer.render(scene, camera);
+				}
+
+				function onWindowResize(event) {
+					renderer.setSize(window.innerWidth, window.innerHeight);
+					uniforms.iResolution.value.x = renderer.domElement.width;
+					uniforms.iResolution.value.y = renderer.domElement.height;
+				}
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			html {
+   height: 100%;
+}
+body {
+   min-height: 100%;
+   overflow: hidden;
+   margin: 0;
+   background-color: #1f1f1f;
+}
+canvas {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas-bg" class="canvas-bg"></canvas>
+<script id="vs" type="x-shader/x-vertex">
+	
+  attribute vec3 position;
+  attribute vec2 uv;
+
+  varying vec2 vUv;
+
+  void main(void) {
+    vUv = uv;
+    gl_Position = vec4(position, 1.0);
+  }
+</script>
+<script id="fs" type="x-shader/x-fragment">
+
+  precision highp float;
+
+  uniform vec2 resolution;
+  uniform vec2 imageResolution;
+  uniform sampler2D texture;
+
+  varying vec2 vUv;
+
+  void main(void) {
+    vec2 ratio = vec2(
+        min((resolution.x / resolution.y) / (imageResolution.x / imageResolution.y), 1.0),
+        min((resolution.y / resolution.x) / (imageResolution.y / imageResolution.x), 1.0)
+      );
+
+    vec2 uv = vec2(
+        vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+        vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+      );
+    gl_FragColor = texture2D(texture, uv);
+  }
+  </script>
+  <script src="three.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			const canvas = document.getElementById('canvas-bg');
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  canvas: canvas,
+  alpha: true,
+});
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, document.body.clientWidth / document.body.clientHeight, 1, 100);
+
+class Plane {
+  constructor() {
+    this.uniforms = {};
+    this.texture = null;
+    this.mesh = null;
+  }
+  loadTexture(image, callback) {
+    const loader = new THREE.TextureLoader();
+    loader.load(image, (texture) => {
+      texture.magFilter = THREE.NearestFilter;
+      texture.minFilter = THREE.NearestFilter;
+      this.texture = texture;
+      this.mesh = this.createMesh();
+      callback();
+    });
+  }
+  createMesh() {
+    this.uniforms = {
+      resolution: {
+        type: 'v2',
+        value: new THREE.Vector2(document.body.clientWidth, document.body.clientHeight),
+      },
+      imageResolution: {
+        type: 'v2',
+        value: new THREE.Vector2(2048, 1356),
+      },
+      texture: {
+        type: 't',
+        value: this.texture,
+      }
+    };
+    return new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(2, 2),
+      new THREE.RawShaderMaterial({
+        uniforms: this.uniforms,
+        vertexShader: document.getElementById('vs').textContent,
+        fragmentShader: document.getElementById('fs').textContent,
+      })
+    );
+  }
+  render(time) {
+    if (this.stop) return;
+    this.uniforms.time.value += time / this.interval;
+    if (this.uniforms.time.value > 1) {
+//    this.uniforms.time.value = 0;
+//    this.prev_num = this.next_num;
+//    this.uniforms.texPrev.value = this.textures[this.next_num];
+//    while (this.next_num == this.prev_num) {
+//      this.next_num = Math.floor(Math.random() * this.textures.length);
+//    }
+//    this.uniforms.texNext.value = this.textures[this.next_num];
+    }
+  }
+  resize() {
+    this.uniforms.resolution.value.set(document.body.clientWidth, document.body.clientHeight);
+  }
+}
+const plane = new Plane();
+
+const render = () => {
+  renderer.render(scene, camera);
+}
+const renderLoop = () => {
+  render();
+  requestAnimationFrame(renderLoop);
+}
+const setEvent = () => {
+  window.addEventListener('resize', () => {
+    resizeWindow();
+  });
+}
+const resizeWindow = () => {
+  canvas.width = document.body.clientWidth;
+  canvas.height = document.body.clientHeight;
+  camera.aspect = document.body.clientWidth / document.body.clientHeight;
+  camera.updateProjectionMatrix();
+  //plane.resize();
+  plane.mesh.material.uniforms.resolution.value.set(document.body.clientWidth, document.body.clientHeight);
+  renderer.setSize(document.body.clientWidth, document.body.clientHeight);
+}
+const init = () => {
+  renderer.setSize(document.body.clientWidth, document.body.clientHeight);
+  renderer.setClearColor(0xffffff, 0.0);
+
+  plane.loadTexture('osaka01.jpg', () => {
+    scene.add(plane.mesh);
+    setEvent();
+    resizeWindow();
+    renderLoop();
+  });
+}
+init();
+
+		</script>
+	</body>
+</html>
